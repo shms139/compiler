@@ -8,16 +8,19 @@ HTML_COMMENT: '<!--' .*? '-->' -> skip;
 /* ---- Mode switches ---- */
 STYLE_OPEN: '<style>' -> pushMode(CSS);
 SCRIPT_OPEN: '<script>' -> pushMode(SCRIPT);
+PYTHON_START: '{% python %}' -> pushMode(PYTHON);
+
 JINJA_EXPR_START: '{{' -> pushMode(JINJA);
 JINJA_STMT_START: '{%' -> pushMode(JINJA);
 JINJA_COMMENT: '{#' .*? '#}' -> skip;
+
 
 /* ---- HTML ---- */
 HTML_TAG_START : '<' TAG_NAME -> pushMode(TAG);
 HTML_TAG_CLOSE : '</' TAG_NAME HTML_WS? '>';
 HTML_TEXT      : ~[<{\n]+ ;
 HTML_WS        : [ \t\r\n]+ -> skip;
-TAG_NAME: [a-zA-Z][a-zA-Z0-9-]*;
+ TAG_NAME: [a-zA-Z][a-zA-Z0-9-]*;
 
 /* ===================== TAG MODE ===================== */
 mode TAG;
@@ -67,6 +70,35 @@ mode SCRIPT;
 
 SCRIPT_CLOSE: '</script>' -> popMode;
 SCRIPT_TEXT: .+?;
+
+/* ===================== PYTHON MODE ===================== */
+mode PYTHON;
+
+PYTHON_END: '{% endpython %}' -> popMode;
+
+/* Keywords */
+PY_PRINT: 'print';
+PY_RETURN: 'return';
+
+/* Identifiers */
+PY_ID: [a-zA-Z_][a-zA-Z0-9_]*;
+
+/* Literals */
+PY_INT: [0-9]+;
+PY_FLOAT: [0-9]+ '.' [0-9]+;
+PY_STRING: '"' (~["\r\n])* '"' | '\'' (~['\r\n])* '\'';
+
+/* Operators */
+PY_ASSIGN: '=';
+PY_OP: '+' | '-' | '*' | '/';
+
+/* Symbols */
+PY_LPAREN: '(';
+PY_RPAREN: ')';
+
+/* Whitespace */
+PY_WS: [ \t\r\n]+ -> skip;
+
 
 /* ===================== JINJA MODE ===================== */
 mode JINJA;

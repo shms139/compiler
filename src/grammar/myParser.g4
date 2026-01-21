@@ -10,6 +10,7 @@ node
     : htmlNode
     | jinjaNode
     | styleNode
+    | pythonBlock
 //    | scriptNode
     ;
 /* ===================== HTML ===================== */
@@ -70,6 +71,44 @@ cssValue
 //scriptNode
 //    : SCRIPT_OPEN SCRIPT_TEXT* SCRIPT_CLOSE
 //    ;
+
+
+/* ===================== PYTHON ===================== */
+
+pythonBlock
+    : PYTHON_START pythonStmt* PYTHON_END
+    ;
+
+pythonStmt
+    : assignment
+    | printStmt
+    | returnStmt
+    ;
+
+assignment
+    : PY_ID PY_ASSIGN pythonExpr
+    ;
+
+printStmt
+    : PY_PRINT PY_LPAREN pythonExpr PY_RPAREN
+    ;
+
+returnStmt
+    : PY_RETURN pythonExpr
+    ;
+
+pythonExpr
+    : pythonTerm (PY_OP pythonTerm)*
+    ;
+
+pythonTerm
+    : PY_ID
+    | PY_INT
+    | PY_FLOAT
+    | PY_STRING
+    | PY_LPAREN pythonExpr PY_RPAREN
+    ;
+
 
 /* ===================== JINJA ===================== */
 jinjaNode
